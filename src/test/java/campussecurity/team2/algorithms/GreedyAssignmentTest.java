@@ -1,0 +1,197 @@
+package campussecurity.team2.algorithms;
+
+import campussecurity.team2.models.Incident;
+import campussecurity.team2.models.Resource;
+import campussecurity.team2.services.GreedyAssignmentService;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+/**
+ * Unit tests for {@link GreedyAssignment}.
+ *
+ * <p>Covers the required scenarios: best resource selection, unavailable and
+ * wrong-type filtering, every tie-break rule, all null/empty edge cases,
+ * single and multiple candidates, and a large dataset simulation. Also covers
+ * the {@link GreedyAssignmentService} facade.</p>
+ */
+class GreedyAssignmentTest {
+
+    private static Incident medicalIncident() {
+        return new Incident("INC001", Incident.TYPE_MEDICAL, "HIGH", "Hall 1", "OPEN");
+    }
+
+    private static Resource ambulance(String id, boolean available, int responseTime, int workload) {
+        return new Resource(id, Resource.TYPE_AMBULANCE, "Central", available, responseTime, workload, "IDLE");
+    }
+
+    private static Resource fireUnit(String id, boolean available, int responseTime, int workload) {
+        return new Resource(id, Resource.TYPE_FIRE_UNIT, "Central", available, responseTime, workload, "IDLE");
+    }
+
+    @Test
+    void assignBestResourceSelectsFastestAvailableResource() {
+        Resource[] resources = {
+                ambulance("AMB001", true, 7, 3),
+                ambulance("AMB002", true, 4, 5),
+                ambulance("AMB003", false, 2, 0)
+        };
+        Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB002", assigned.getResourceId());
+    }
+
+    @Test
+    void assignBestResourceIgnoresUnavailableResources() {
+        Resource[] resources = {
+                ambulance("AMB001", false, 2, 0),
+                ambulance("AMB002", true, 9, 1),
+                ambulance("AMB003", true, 5, 2)
+        };
+        Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB003", assigned.getResourceId());
+    }
+
+    @Test
+    void assignBestResourceIgnoresWrongResourceType() {
+        Resource[] resources = {
+                fireUnit("FIRE001", true, 1, 0),
+                ambulance("AMB001", true, 8, 1)
+        };
+        Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB001", assigned.getResourceId());
+    }
+
+    @Test
+    void assignBestResourceBreaksResponseTimeTieByWorkload() {
+        Resource[] resources = {
+                ambulance("AMB001", true, 5, 4),
+                ambulance("AMB002", true, 5, 2)
+        };
+        Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB002", assigned.getResourceId());
+    }
+
+    @Test
+    void assignBestResourceBreaksResponseAndWorkloadTieBySmallestId() {
+        Resource[] resources = {
+                ambulance("AMB010", true, 6, 3),
+                ambulance("AMB002", true, 6, 3),
+                ambulance("AMB005", true, 6, 3)
+        };
+        Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB002", assigned.getResourceId());
+    }
+
+    @Test
+    void assignBestResourceHandlesDuplicateResourceIdsWithoutCrashing() {
+        Resource[] resources = {
+                ambulance("AMB001", true, 4, 2),
+                ambulance("AMB001", true, 4, 2)
+        };
+        Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB001", assigned.getResourceId());
+    }
+
+    @Test
+    void assignBestResourceReturnsNullWhenNoResourceIsAvailable() {
+        Resource[] resources = {
+                ambulance("AMB001", false, 2, 0),
+                ambulance("AMB002", false, 3, 1)
+        };
+        assertNull(GreedyAssignment.assignBestResource(medicalIncident(), resources));
+    }
+
+    @Test
+    void assignBestResourceReturnsNullForEmptyArray() {
+        assertNull(GreedyAssignment.assignBestResource(medicalIncident(), new Resource[0]));
+    }
+
+    @Test
+    void assignBestResourceReturnsNullForNullIncident() {
+        Resource[] resources = {ambulance("AMB001", true, 4, 1)};
+        assertNull(GreedyAssignment.assignBestResource(null, resources));
+    }
+
+    @Test
+    void assignBestResourceReturnsNullForNullArray() {
+        assertNull(GreedyAssignment.assignBestResource(medicalIncident(), null));
+    }
+
+    @Test
+    void assignBestResourceSkipsNullElementsInArraySafely() {
+        Resource[] resources = {
+                null,
+                ambulance("AMB002", true, 5, 1),
+                null
+        };
+        Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB002", assigned.getResourceId());
+    }
+
+    @Test
+    void assignBestResourceWithSingleMatchingResourceReturnsIt() {
+        Resource[] resources = {ambulance("AMB001", true, 6, 0)};
+        Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB001", assigned.getResourceId());
+    }
+
+    @Test
+    void assignBestResourceWithSingleUnavailableResourceReturnsNull() {
+        Resource[] resources = {ambulance("AMB001", false, 6, 0)};
+        assertNull(GreedyAssignment.assignBestResource(medicalIncident(), resources));
+    }
+
+    @Test
+    void assignBestResourceWithMultipleValidResourcesPicksFastest() {
+        Resource[] resources = {
+                ambulance("AMB001", true, 12, 0),
+                ambulance("AMB002", true, 7, 4),
+                ambulance("AMB003", true, 3, 2),
+                ambulance("AMB004", true, 9, 1)
+        };
+        Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB003", assigned.getResourceId());
+    }
+
+    @Test
+    void assignBestResourceOnLargeDatasetSelectsDeterministically() {
+        int size = 1000;
+        Resource[] resources = new Resource[size];
+        for (int i = 0; i < size; i++) {
+            resources[i] = ambulance("AMB" + String.format("%04d", i), true, 1000 - i, i % 5);
+        }
+        Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB0999", assigned.getResourceId());
+    }
+
+    @Test
+    void serviceAssignsBestResource() {
+        GreedyAssignmentService service = new GreedyAssignmentService();
+        Resource[] resources = {
+                ambulance("AMB001", true, 7, 3),
+                ambulance("AMB002", true, 4, 5)
+        };
+        Resource assigned = service.assign(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB002", assigned.getResourceId());
+    }
+
+    @Test
+    void serviceHandlesNullInputsGracefully() {
+        GreedyAssignmentService service = new GreedyAssignmentService();
+        assertNull(service.assign(null, new Resource[0]));
+        assertNull(service.assign(medicalIncident(), null));
+    }
+}
