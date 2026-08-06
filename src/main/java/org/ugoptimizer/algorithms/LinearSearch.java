@@ -1,4 +1,4 @@
-package campussecurity.team2.algorithms;
+package org.ugoptimizer.algorithms;
 
 /**
  * Reusable Linear Search implementation used by Team 2 (Incident Management and
