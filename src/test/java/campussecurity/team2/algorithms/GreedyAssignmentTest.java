@@ -1,11 +1,12 @@
 package campussecurity.team2.algorithms;
 
-import campussecurity.team2.models.Incident;
-import campussecurity.team2.models.Resource;
 import campussecurity.team2.services.GreedyAssignmentService;
 import org.junit.jupiter.api.Test;
+import org.ugoptimizer.model.Resource;
+import org.ugoptimizer.model.ServiceRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -19,16 +20,16 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 class GreedyAssignmentTest {
 
-    private static Incident medicalIncident() {
-        return new Incident("INC001", Incident.TYPE_MEDICAL, "HIGH", "Hall 1", "OPEN");
+    private static ServiceRequest medicalIncident() {
+        return new ServiceRequest("INC001", ServiceRequest.TYPE_MEDICAL, "HIGH", "Hall 1", "OPEN", "2026-08-06T06:00:00Z");
     }
 
     private static Resource ambulance(String id, boolean available, int responseTime, int workload) {
-        return new Resource(id, Resource.TYPE_AMBULANCE, "Central", available, responseTime, workload, "IDLE");
+        return new Resource(id, Resource.TYPE_AMBULANCE, "IDLE", "Central", available, responseTime, workload);
     }
 
     private static Resource fireUnit(String id, boolean available, int responseTime, int workload) {
-        return new Resource(id, Resource.TYPE_FIRE_UNIT, "Central", available, responseTime, workload, "IDLE");
+        return new Resource(id, Resource.TYPE_FIRE_UNIT, "IDLE", "Central", available, responseTime, workload);
     }
 
     @Test
@@ -40,7 +41,7 @@ class GreedyAssignmentTest {
         };
         Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB002", assigned.getResourceId());
+        assertEquals("AMB002", assigned.getId());
     }
 
     @Test
@@ -52,7 +53,7 @@ class GreedyAssignmentTest {
         };
         Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB003", assigned.getResourceId());
+        assertEquals("AMB003", assigned.getId());
     }
 
     @Test
@@ -63,7 +64,7 @@ class GreedyAssignmentTest {
         };
         Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB001", assigned.getResourceId());
+        assertEquals("AMB001", assigned.getId());
     }
 
     @Test
@@ -74,7 +75,7 @@ class GreedyAssignmentTest {
         };
         Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB002", assigned.getResourceId());
+        assertEquals("AMB002", assigned.getId());
     }
 
     @Test
@@ -86,7 +87,7 @@ class GreedyAssignmentTest {
         };
         Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB002", assigned.getResourceId());
+        assertEquals("AMB002", assigned.getId());
     }
 
     @Test
@@ -97,7 +98,7 @@ class GreedyAssignmentTest {
         };
         Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB001", assigned.getResourceId());
+        assertEquals("AMB001", assigned.getId());
     }
 
     @Test
@@ -134,7 +135,7 @@ class GreedyAssignmentTest {
         };
         Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB002", assigned.getResourceId());
+        assertEquals("AMB002", assigned.getId());
     }
 
     @Test
@@ -142,7 +143,7 @@ class GreedyAssignmentTest {
         Resource[] resources = {ambulance("AMB001", true, 6, 0)};
         Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB001", assigned.getResourceId());
+        assertEquals("AMB001", assigned.getId());
     }
 
     @Test
@@ -161,7 +162,7 @@ class GreedyAssignmentTest {
         };
         Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB003", assigned.getResourceId());
+        assertEquals("AMB003", assigned.getId());
     }
 
     @Test
@@ -173,7 +174,7 @@ class GreedyAssignmentTest {
         }
         Resource assigned = GreedyAssignment.assignBestResource(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB0999", assigned.getResourceId());
+        assertEquals("AMB0999", assigned.getId());
     }
 
     @Test
@@ -185,7 +186,7 @@ class GreedyAssignmentTest {
         };
         Resource assigned = service.assign(medicalIncident(), resources);
         assertNotNull(assigned);
-        assertEquals("AMB002", assigned.getResourceId());
+        assertEquals("AMB002", assigned.getId());
     }
 
     @Test
@@ -193,5 +194,20 @@ class GreedyAssignmentTest {
         GreedyAssignmentService service = new GreedyAssignmentService();
         assertNull(service.assign(null, new Resource[0]));
         assertNull(service.assign(medicalIncident(), null));
+    }
+
+    @Test
+    void serviceUpdatesAssignedResourceState() {
+        GreedyAssignmentService service = new GreedyAssignmentService();
+        Resource[] resources = {
+                ambulance("AMB001", true, 7, 3),
+                ambulance("AMB002", true, 4, 5)
+        };
+        Resource assigned = service.assign(medicalIncident(), resources);
+        assertNotNull(assigned);
+        assertEquals("AMB002", assigned.getId());
+        assertFalse(assigned.isAvailable());
+        assertEquals(6, assigned.getCurrentWorkload());
+        assertEquals("DISPATCHED", assigned.getStatus());
     }
 }

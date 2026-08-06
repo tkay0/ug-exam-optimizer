@@ -1,7 +1,7 @@
 package campussecurity.team2.algorithms;
 
-import campussecurity.team2.models.Incident;
-import campussecurity.team2.models.Resource;
+import org.ugoptimizer.model.Resource;
+import org.ugoptimizer.model.ServiceRequest;
 
 /**
  * Greedy assignment algorithm used by Team 2 to automatically assign the most
@@ -25,7 +25,7 @@ import campussecurity.team2.models.Resource;
  *       {@code available == true} are considered. Unavailable resources are
  *       never assigned.</li>
  *   <li><b>Rule 2 — Type match:</b> the resource type must be able to respond
- *       to the incident (see {@link Incident#matchesResourceType(String)}),
+ *       to the incident (see {@link ServiceRequest#matchesResourceType(String)}),
  *       e.g. Medical Emergency → Ambulance, Fire → Fire Unit, Theft →
  *       Security Patrol.</li>
  *   <li><b>Rule 3 — Response time:</b> among valid resources, the one with the
@@ -120,7 +120,7 @@ public final class GreedyAssignment {
      *         exists (null incident, null or empty array, no available
      *         resource, or no type-matching resource)
      */
-    public static Resource assignBestResource(Incident incident, Resource[] resources) {
+    public static Resource assignBestResource(ServiceRequest incident, Resource[] resources) {
         if (incident == null || resources == null) {
             return null;
         }
@@ -143,10 +143,10 @@ public final class GreedyAssignment {
      * @param resource the resource to test; may be {@code null}
      * @return {@code true} if the resource is available and type-matching
      */
-    private static boolean isEligible(Incident incident, Resource resource) {
+    private static boolean isEligible(ServiceRequest incident, Resource resource) {
         return resource != null
                 && resource.isAvailable()
-                && incident.matchesResourceType(resource.getResourceType());
+                && incident.matchesResourceType(resource.getType());
     }
 
     /**
@@ -168,7 +168,7 @@ public final class GreedyAssignment {
         if (candidate.getCurrentWorkload() != currentBest.getCurrentWorkload()) {
             return candidate.getCurrentWorkload() < currentBest.getCurrentWorkload();
         }
-        return compareResourceIds(candidate.getResourceId(), currentBest.getResourceId()) < 0;
+        return compareResourceIds(candidate.getId(), currentBest.getId()) < 0;
     }
 
     /**
