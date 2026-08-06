@@ -21,3 +21,17 @@ Managing and distributing examination materials to multiple halls across campus 
 * **Version Control:** Git & GitHub
 
 ---
+
+## 🧪 Building and Testing
+
+This project currently uses plain `javac`/`java`. The JUnit Platform Console Standalone jar needed to run tests is committed under `lib/`, so no setup step is required — just compile and run the test suite:
+
+```bash
+javac --release 17 -d out/main $(find src/main/java -name "*.java")
+javac --release 17 -cp "out/main;lib/junit-platform-console-standalone-1.10.3.jar" -d out/test $(find tests -name "*.java")
+java -jar lib/junit-platform-console-standalone-1.10.3.jar execute --class-path "out/main;out/test" --scan-class-path --details=tree
+```
+
+A successful run ends with `0 tests failed`.
+
+---
