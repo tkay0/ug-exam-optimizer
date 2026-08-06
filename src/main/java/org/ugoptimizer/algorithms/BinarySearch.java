@@ -1,4 +1,4 @@
-package campussecurity.team2.algorithms;
+package org.ugoptimizer.algorithms;
 
 /**
  * Reusable Binary Search implementation used by Team 2 (Incident Management
@@ -114,12 +114,18 @@ public final class BinarySearch {
      * the target is returned (not necessarily the first or last occurrence,
      * since the scan converges on the first match in the halving process).</p>
      *
+     * <p>An array containing {@code null} elements does not satisfy the
+     * sortedness precondition. Instead of throwing a
+     * {@code NullPointerException} when the scan reaches a {@code null}
+     * element, {@code -1} is returned to indicate the target is not present.</p>
+     *
      * @param array  the sorted array to search; may be {@code null}
      * @param target the element to look for; may be {@code null}
      * @param <T>    the type of elements, comparable with itself
      * @return the index of an occurrence of {@code target}, or {@code -1} if
      *         the target is absent, the array is empty, the array is
-     *         {@code null}, or the target is {@code null}
+     *         {@code null}, the target is {@code null}, or the array contains
+     *         a {@code null} element
      */
     public static <T extends Comparable<T>> int search(T[] array, T target) {
         if (array == null || target == null) {
@@ -129,7 +135,11 @@ public final class BinarySearch {
         int high = array.length - 1;
         while (low <= high) {
             int mid = low + (high - low) / 2;
-            int comparison = array[mid].compareTo(target);
+            T element = array[mid];
+            if (element == null) {
+                return -1;
+            }
+            int comparison = element.compareTo(target);
             if (comparison == 0) {
                 return mid;
             } else if (comparison < 0) {
@@ -148,18 +158,25 @@ public final class BinarySearch {
      * <p>An empty array or an array with a single element is vacuously
      * sorted. A {@code null} array is treated as sorted so callers can run the
      * check unconditionally before invoking {@link #search(Comparable[],
-     * Comparable)}.</p>
+     * Comparable)}. An array containing {@code null} elements is not sorted:
+     * the natural ordering of {@code T} does not apply to {@code null}, so
+     * {@code false} is returned instead of throwing a
+     * {@code NullPointerException}.</p>
      *
      * @param array the array to inspect; may be {@code null}
      * @param <T>   the type of elements, comparable with itself
      * @return {@code true} if the array is {@code null}, empty, has fewer than
-     *         two elements, or is sorted in non-decreasing order
+     *         two elements, or is sorted in non-decreasing order; {@code false}
+     *         if the array contains any {@code null} element
      */
     public static <T extends Comparable<T>> boolean isSorted(T[] array) {
         if (array == null || array.length < 2) {
             return true;
         }
         for (int i = 1; i < array.length; i++) {
+            if (array[i] == null || array[i - 1] == null) {
+                return false;
+            }
             if (array[i].compareTo(array[i - 1]) < 0) {
                 return false;
             }

@@ -1,4 +1,4 @@
-package campussecurity.team2.algorithms;
+package org.ugoptimizer.algorithms;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * <p>Covers the scenarios required by Team 2: element found in the middle,
  * first element, last element, missing element, empty array, single element,
- * duplicate values, null input safety, and the {@code isSorted} helper.</p>
+ * duplicate values, null input safety, null elements, and the {@code isSorted}
+ * helper.</p>
  */
 class BinarySearchTest {
 
@@ -72,6 +73,12 @@ class BinarySearchTest {
     }
 
     @Test
+    void searchArrayContainingNullElementReturnsMinusOneWithoutCrashing() {
+        String[] withNull = {"INC001", null, "INC050", "INC100"};
+        assertEquals(-1, BinarySearch.search(withNull, "INC001"));
+    }
+
+    @Test
     void isSortedAcceptsSortedArray() {
         assertTrue(BinarySearch.isSorted(SORTED_INCIDENTS));
     }
@@ -86,5 +93,11 @@ class BinarySearchTest {
     void isSortedAcceptsEmptyAndSingleElementArrays() {
         assertTrue(BinarySearch.isSorted(new String[0]));
         assertTrue(BinarySearch.isSorted(new String[]{"INC001"}));
+    }
+
+    @Test
+    void isSortedRejectsArrayContainingNullElementWithoutCrashing() {
+        String[] withNull = {"INC001", "INC050", null, "INC100"};
+        assertFalse(BinarySearch.isSorted(withNull));
     }
 }
