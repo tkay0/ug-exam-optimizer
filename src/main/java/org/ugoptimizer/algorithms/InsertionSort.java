@@ -1,4 +1,4 @@
-package campussecurity.team2.algorithms;
+package org.ugoptimizer.algorithms;
 
 /**
  * Reusable Insertion Sort implementation used by Team 2 (Incident Management
