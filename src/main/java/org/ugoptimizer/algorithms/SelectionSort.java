@@ -1,4 +1,4 @@
-package campussecurity.team2.algorithms;
+package org.ugoptimizer.algorithms;
 
 /**
  * Reusable Selection Sort implementation used by Team 2 (Incident Management
@@ -9,8 +9,8 @@ package campussecurity.team2.algorithms;
  * The system manages many campus security incidents and supporting records
  * (incident IDs, resource availability, report rows). Sorting organizes this
  * data so it can be displayed in reports, prepared for dispatch, or made
- * ready for faster Binary Search. Selection Sort is a simple, stable-in-practice
- * comparison-based sort chosen because it performs the minimum possible number
+ * ready for faster Binary Search. Selection Sort is a simple comparison-based
+ * sort chosen because it performs the minimum possible number
  * of writes, which matters when the records are large objects.
  * </p>
  *
