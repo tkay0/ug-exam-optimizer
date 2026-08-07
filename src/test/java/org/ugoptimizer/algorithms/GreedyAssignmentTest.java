@@ -1,6 +1,6 @@
-package campussecurity.team2.algorithms;
+package org.ugoptimizer.algorithms;
 
-import campussecurity.team2.services.GreedyAssignmentService;
+import org.ugoptimizer.service.GreedyAssignmentService;
 import org.junit.jupiter.api.Test;
 import org.ugoptimizer.model.Resource;
 import org.ugoptimizer.model.ServiceRequest;

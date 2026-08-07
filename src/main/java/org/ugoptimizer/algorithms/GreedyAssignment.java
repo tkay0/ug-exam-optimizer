@@ -1,4 +1,4 @@
-package campussecurity.team2.algorithms;
+package org.ugoptimizer.algorithms;
 
 import org.ugoptimizer.model.Resource;
 import org.ugoptimizer.model.ServiceRequest;

@@ -1,6 +1,6 @@
-package campussecurity.team2.services;
+package org.ugoptimizer.service;
 
-import campussecurity.team2.algorithms.GreedyAssignment;
+import org.ugoptimizer.algorithms.GreedyAssignment;
 import org.ugoptimizer.model.Resource;
 import org.ugoptimizer.model.ServiceRequest;
 
