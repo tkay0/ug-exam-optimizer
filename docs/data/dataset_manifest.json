@@ -1,0 +1,36 @@
+{
+  "generatedDate": "2026-08-08",
+  "version": "2.1-official-template-alignment",
+  "project": "University of Ghana Campus Security and Emergency Response Optimizer",
+  "counts": {
+    "locations": 50,
+    "roads": 100,
+    "serviceRequests": 300,
+    "resources": 30,
+    "roadScenarios": 12,
+    "auditEvents": 60,
+    "algorithmRunPlanRows": 30
+  },
+  "officialTemplateHeaders": {
+    "locations": ["location_id", "name", "area", "location_type", "x_coord", "y_coord"],
+    "roads": ["road_id", "from_location_id", "to_location_id", "distance_km", "travel_time_min", "condition_weight"],
+    "serviceRequests": ["request_id", "source_location_id", "destination_location_id", "category", "urgency", "time_submitted", "deadline", "status"],
+    "resources": ["resource_id", "resource_type", "home_location_id", "capacity", "availability_status"]
+  },
+  "projectExtensionColumnsPreserved": true,
+  "masterWorkbookStoredOutsideRepository": true,
+  "roadModel": {
+    "distinctTravelTimes": 60,
+    "travelTimeMinMinutes": 0.33,
+    "travelTimeMaxMinutes": 1.88,
+    "controlledBlockedRoads": [
+      6,
+      2,
+      36,
+      37
+    ],
+    "blockageScenarioPreservesConnectivity": true
+  },
+  "validationErrors": [],
+  "algorithmRunStatus": "PLANNED_ONLY"
+}
